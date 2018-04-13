@@ -26,8 +26,8 @@ DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
-MINUTES=120 # minuti di recupero
-TIPOLOGIE=['T'] # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una lista
+MINUTES=130 # minuti di recupero
+TIPOLOGIE=['PP'] # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una lista
 # inizializzazione delle date
 datafine=dt.datetime.now()
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
@@ -60,7 +60,7 @@ df_sensori=pd.read_sql(Query, conn)
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
 
-
+df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
@@ -96,7 +96,7 @@ for row in df_section.itertuples():
         print("Errore: REMWS non raggiungibile", end="\r")
     risposta=js.loads(r.text)
     outcome=risposta['data']['outcome']
-    if(outcome==0):
+    if(outcome==0 & len(risposta)>2):
         # estraggo il dato
         aa=risposta['data']['sensor_data_list'][0]['data']
         #se contiene almeno tre elementi c'è anche il dato
