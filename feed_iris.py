@@ -32,6 +32,7 @@ TIPOLOGIE=['T'] # elenco delle tipologie da cercare nella tabella delle osservaz
 datafine=dt.datetime.now()
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 #definizione delle funzioni
+# la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
     # definisco dataframe della risposta
     df_risposta=pd.DataFrame(columns=['data_e_ora','misura','validita'])
@@ -42,6 +43,7 @@ def seleziona_richiesta(Risposta):
     #    print(i,aa[i]['datarow'].split(";")[2])
         df_risposta.loc[i-1]=[aa[i]['datarow'].split(";")[0],aa[i]['datarow'].split(";")[1],aa[i]['datarow'].split(";")[2]]
     return df_risposta
+###
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
 conn=engine.connect()
@@ -49,8 +51,7 @@ conn=engine.connect()
 #preparazione dell'elenco dei sensori
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,4);'
 df_sensori=pd.read_sql(Query, conn)
-# preparazione dei dati
-#QueryJoin='Select "m_osservazioni_tr"."idsensore", "m_osservazioni_tr"."data_e_ora","m_osservazioni_tr"."misura" from "realtime"."m_osservazioni_tr" inner join "dati_di_base"."anagraficasensori" on ("m_osservazioni_tr"."idsensore"="anagraficasensori"."idsensore") where "anagraficasensori"."datafine" is NULL and "m_osservazioni_tr"."data_e_ora" between \''+datainizio.strftime("%Y-%m-%d %H:%M")+'\' and \''+datafine.strftime("%Y-%m-%d %H:%M")+'\';'
+
 #ALIMETAZIONE DIRETTA
 # suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
 # Se l'inserimento fallisce vuol dire che qualcun altro ha inserito il dato (ovvero un processo in parallelo, il che èstrano...)
@@ -72,8 +73,7 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
 conn=engine.connect()
-
-
+# inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     frame_dati["sensor_id"]=row.idsensore
     # assegno operatore e funzione corretti
