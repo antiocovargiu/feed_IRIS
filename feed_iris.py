@@ -102,11 +102,17 @@ for row in df_section.itertuples():
     #print (richiesta)
     try:
         r=requests.post(url,data=js.dumps(richiesta))
+        print(r.status_code)
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
     risposta=js.loads(r.text)
+    ci_sono_dati=False
+    #controllo progressivamente se la risposta è buona e se ci sono dati
     outcome=risposta['data']['outcome']
-    if(outcome==0 & len(r.text)>0):
+    if (outcome==0):
+        if (len(risposta['data']['sensor_data_list'])>0):
+            ci_sono_dati=True
+    if(ci_sono_dati):
         # estraggo il dato
         aa=risposta['data']['sensor_data_list'][0]['data']
         #se contiene almeno tre elementi c'è anche il dato
