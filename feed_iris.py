@@ -25,7 +25,9 @@ url=REMWS_GATEWAY
 DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
-AUTORE=os.getenv('COMPUTERNAME')
+AUTORE=os.getenv('COMPUTERNAME')+"@"+os.getenv('HOSTNAME')
+if (len(AUTORE)==0):
+    AUTORE='localhost'
 MINUTES=130 # minuti di recupero
 TIPOLOGIE=['T'] # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una lista
 # inizializzazione delle date
@@ -49,9 +51,7 @@ def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,aut
     Query_Insert="INSERT into "+schema+"."+table+\
     " (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
     VALUES ("+str(idsensore)+",'"+tipo+"',"+str(operatore)+",'"+\
-    datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+\
-    mystring+"');"
-    print(Query_Insert)
+    datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+mystring+"');"
     return Query_Insert
 ###
 #FASE 2 - query al dB
@@ -106,7 +106,7 @@ for row in df_section.itertuples():
         print("Errore: REMWS non raggiungibile", end="\r")
     risposta=js.loads(r.text)
     outcome=risposta['data']['outcome']
-    if(outcome==0 ):
+    if(outcome==0 & len(r.text)>0):
         # estraggo il dato
         aa=risposta['data']['sensor_data_list'][0]['data']
         #se contiene almeno tre elementi c'è anche il dato
