@@ -25,9 +25,9 @@ url=REMWS_GATEWAY
 DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
-AUTORE=os.getenv('COMPUTERNAME')+"@"+os.getenv('HOSTNAME')
-if (len(AUTORE)==0):
-    AUTORE='localhost'
+AUTORE=os.getenv('COMPUTERNAME')
+if (AUTORE==None):
+    AUTORE=os.getenv('HOSTNAME')
 MINUTES=130 # minuti di recupero
 TIPOLOGIE=['T'] # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una lista
 # inizializzazione delle date
