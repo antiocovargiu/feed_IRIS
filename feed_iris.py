@@ -45,11 +45,11 @@ def seleziona_richiesta(Risposta):
     return df_risposta
 def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,autore):
     s=dt.datetime.now()
-    Query_Insert='INSERT into "'+schema+'"."'+table+\
-    '" (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
-    VALUES ('+str(idsensore)+',\''+tipo+'\','+str(operatore)+',\''+\
-    datar.strftime("%Y-%m-%d %H:%M")+'\','+str(misura)+',\''+ autore+'\',\''+\
-    s.strftime("%Y-%m-%d %H:%M")+'\');'
+    Query_Insert="INSERT into "+schema+"."+table+\
+    " (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
+    VALUES ("+str(idsensore)+",'"+tipo+"',"+str(operatore)+",'"+\
+    datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+\
+    s.strftime("%Y-%m-%d %H:%M")+"');"
     print(Query_Insert)
     return Query_Insert
 ###
