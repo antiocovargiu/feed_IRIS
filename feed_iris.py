@@ -43,6 +43,15 @@ def seleziona_richiesta(Risposta):
     #    print(i,aa[i]['datarow'].split(";")[2])
         df_risposta.loc[i-1]=[aa[i]['datarow'].split(";")[0],aa[i]['datarow'].split(";")[1],aa[i]['datarow'].split(";")[2]]
     return df_risposta
+def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,autore):
+    s=dt.datetime.now()
+    Query_Insert='INSERT into "'+schema+'"."'+table+\
+    '" (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
+    VALUES ('+str(idsensore)+',\''+tipo+'\','+str(operatore)+',\''+\
+    datar.strftime("%Y-%m-%d %H:%M")+'\','+str(misura)+',\''+ autore+'\',\''+\
+    s.strftime("%Y-%m-%d %H:%M")+'\');'
+    print(Query_Insert)
+    return Query_Insert
 ###
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
@@ -103,12 +112,10 @@ for row in df_section.itertuples():
         if (len(aa)>2):
             misura=aa[1]['datarow'].split(";")[1]
             #print(row.idsensore, misura)
-            QueryInsert='INSERT into "'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+\
-            '" (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
-            VALUES ('+str(row.idsensore)+',\''+row.nometipologia+'\','+str(id_operatore)+',\''+\
-            data_ricerca.strftime("%Y-%m-%d %H:%M")+'\','+str(misura)+',\''+ AUTORE+'\',\''+\
-            s.strftime("%Y-%m-%d %H:%M")+'\');'
-            print(QueryInsert)
+            
+            QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
+            row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
+            
             try:
                 conn.execute(QueryInsert)
 
