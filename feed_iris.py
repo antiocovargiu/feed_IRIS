@@ -102,7 +102,7 @@ for row in df_section.itertuples():
     #print (richiesta)
     try:
         r=requests.post(url,data=js.dumps(richiesta))
-        print(r.status_code)
+       
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
     risposta=js.loads(r.text)
