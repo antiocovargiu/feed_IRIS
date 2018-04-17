@@ -104,7 +104,7 @@ for row in df_section.itertuples():
     #print (richiesta)
     try:
         r=requests.post(url,data=js.dumps(richiesta))
-       
+
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
     risposta=js.loads(r.text)
@@ -121,15 +121,15 @@ for row in df_section.itertuples():
         if (len(aa)>2):
             misura=aa[1]['datarow'].split(";")[1]
             #print(row.idsensore, misura)
-            
+
             QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
             row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
-            
+
             try:
                 conn.execute(QueryInsert)
 
             except:
-                print("Query non riuscita!")
+                print("Query non riuscita! per ",row.idsensore)
 
     else:
         print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
