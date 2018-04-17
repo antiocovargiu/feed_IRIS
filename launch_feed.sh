@@ -13,10 +13,8 @@ do
    data_corrente=$[ 10#$(date +"%M") % 10 ]
    if [ $data_corrente == 3  ]
    then
-      echo 'lancio script'
       python3 feed_iris.py
    else
      sleep 10
-     echo $data_corrente
    fi
 done

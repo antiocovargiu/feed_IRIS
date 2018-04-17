@@ -16,10 +16,10 @@ import datetime as dt
 import json as js
 import requests
 # variabili di ambiente (da togliere in produzione)
-IRIS_USER_ID='postgres'
-IRIS_USER_PWD='p0stgr3S'
-IRIS_DB_NAME='iris_base'
-IRIS_DB_HOST='10.10.0.19'
+IRIS_USER_ID=os.getenv('IRIS_USER_ID')
+IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
+IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
+IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
 DEBUG=False
@@ -28,8 +28,10 @@ IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
-MINUTES=130 # minuti di recupero
-TIPOLOGIE=['T'] # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una lista
+MINUTES=0 # minuti di recupero
+h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
+# trasformo la stringa in lista
+TIPOLOGIE=h.split()
 # inizializzazione delle date
 datafine=dt.datetime.now()
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
