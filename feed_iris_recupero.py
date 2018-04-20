@@ -25,7 +25,6 @@ AUTORE=os.getenv('COMPUTERNAME')
 MINUTES= 1440 # minuti di recupero
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
-    MINUTES=0 # minuti di recupero in caso GMT+0
     IRIS_USER_ID=os.getenv('IRIS_USER_ID')
     IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
@@ -91,7 +90,7 @@ conn=engine.connect()
 #preparazione dell'elenco dei sensori
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,4);'
 df_sensori=pd.read_sql(Query, conn)
- 
+
 #query di richiesta dati già presenti nel dB
 QueryDati='Select * from "'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'" where "m_osservazioni_tr"."data_e_ora" between \''+datainizio.strftime("%Y-%m-%d %H:%M")+'\' and \''+datafine.strftime("%Y-%m-%d %H:%M")+'\';'
 df_dati=pd.read_sql(QueryDati, conn)
@@ -138,7 +137,7 @@ for row in df_section.itertuples():
         PERIODO=int(MINUTES/10)
         attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
     #ho selezionato il periodo atteso: estraggo il dataframe degli elementi attesi
-    df=attesi.isin(element['data_e_ora'])    
+    df=attesi.isin(element['data_e_ora'])
     #eseguo il ciclo di richiesta sui dati mancanti
     for dato_mancante in attesi[~df]:
         frame_dati["start"]=dato_mancante.strftime("%Y-%m-%d %H:%M")
