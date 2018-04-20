@@ -14,7 +14,7 @@ do
    else
      sleep 30
    fi
-   if [ $2 == "R"]
+   if [ $2 == "R" ]
    then
      python3 feed_iris_recupero.py
      sleep 3600
