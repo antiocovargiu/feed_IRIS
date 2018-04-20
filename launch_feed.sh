@@ -18,4 +18,5 @@ do
    then
      python3 feed_iris_recupero.py
      sleep 3600
+   fi
 done
