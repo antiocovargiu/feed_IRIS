@@ -22,7 +22,7 @@ DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
-MINUTES=120 # minuti di recupero
+MINUTES= 1440 # minuti di recupero
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
     MINUTES=0 # minuti di recupero in caso GMT+0
@@ -34,7 +34,7 @@ if (AUTORE==None):
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date
-datafine=dt.datetime.now()
+datafine=dt.datetime.utcnow()
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
@@ -91,15 +91,18 @@ conn=engine.connect()
 #preparazione dell'elenco dei sensori
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,4);'
 df_sensori=pd.read_sql(Query, conn)
+ 
+#query di richiesta dati già presenti nel dB
+QueryDati='Select * from "'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'" where "m_osservazioni_tr"."data_e_ora" between \''+datainizio.strftime("%Y-%m-%d %H:%M")+'\' and \''+datafine.strftime("%Y-%m-%d %H:%M")+'\';'
+df_dati=pd.read_sql(QueryDati, conn)
 
-#ALIMETAZIONE DIRETTA
-# suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
-# Se l'inserimento fallisce vuol dire che qualcun altro ha inserito il dato (ovvero un processo in parallelo, il che èstrano...)
+#ALIMETAZIONE IN RECUPERO
+# suppongo di avere già dei dati, vedo qule datomanca, lo chiedo e loinserisco.
+# Se l'inserimento fallisce vuol dire che qualcun altro ha inserito il dato (ovvero un processo in parallelo, il che è possibilestrano...)
 
 # selezione dell'ora
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
-
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
 #ciclo sui sensori:
 # strutturo la richiesta
@@ -115,6 +118,8 @@ s=dt.datetime.now()
 conn=engine.connect()
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
+    #estraggo i dati dal dataframe
+    element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
     # assegno operatore e funzione corretti
     if(row.nometipologia=='PP' or row.nometipologia=='N'):
@@ -126,20 +131,31 @@ for row in df_section.itertuples():
     #selezione del valore orario se la frequenza è 60
     if(row.frequenza==60):
         id_periodo=3
+        PERIODO=int(MINUTES/60)
+        attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='60min')
     else:
         id_periodo=1
-    frame_dati["operator_id"]=id_operatore
-    frame_dati["function_id"]=function
-    aa=Richiesta_remwsgwy(frame_dati)
-    if (len(aa)>2):
+        PERIODO=int(MINUTES/10)
+        attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
+    #ho selezionato il periodo atteso: estraggo il dataframe degli elementi attesi
+    df=attesi.isin(element['data_e_ora'])    
+    #eseguo il ciclo di richiesta sui dati mancanti
+    for dato_mancante in attesi[~df]:
+        frame_dati["start"]=dato_mancante.strftime("%Y-%m-%d %H:%M")
+        frame_dati["finish"]=dato_mancante.strftime("%Y-%m-%d %H:%M")
+        frame_dati["operator_id"]=id_operatore
+        frame_dati["function_id"]=function
+        aa=Richiesta_remwsgwy(frame_dati)
+        if (len(aa)>2):
         # prendo solo il primo element
-        misura=aa[1]['datarow'].split(";")[1]
-        QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
-        row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
-        try:
-            conn.execute(QueryInsert)
-        except:
-            print("Query non riuscita! per ",row.idsensore)
-    else:
-        print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+            misura=aa[1]['datarow'].split(";")[1]
+            QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
+            row.idsensore,row.nometipologia,id_operatore,dato_mancante,misura,AUTORE)
+            try:
+                conn.execute(QueryInsert)
+                print("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+            except:
+                print("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+        else:
+            print ("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
 print(s,dt.datetime.now())
