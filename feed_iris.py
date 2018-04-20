@@ -16,21 +16,22 @@ import datetime as dt
 import json as js
 import requests
 # variabili di ambiente (da togliere in produzione)
-IRIS_USER_ID=os.getenv('IRIS_USER_ID')
-IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
-IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
-IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
 DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
+MINUTES=120 # minuti di recupero
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
-MINUTES=0 # minuti di recupero
-h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
-# trasformo la stringa in lista
+    MINUTES=0 # minuti di recupero in caso GMT+0
+    IRIS_USER_ID=os.getenv('IRIS_USER_ID')
+    IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
+    IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
+    IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
+    h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
+    # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date
 datafine=dt.datetime.now()
@@ -48,6 +49,7 @@ def seleziona_richiesta(Risposta):
         df_risposta.loc[i-1]=[aa[i]['datarow'].split(";")[0],aa[i]['datarow'].split(";")[1],aa[i]['datarow'].split(";")[2]]
     return df_risposta
 def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,autore):
+    # la funzione crea la query da per l'inserimento del dato
     s=dt.datetime.now()
     mystring=s.strftime("%Y-%m-%d %H:%M")
     Query_Insert="INSERT into "+schema+"."+table+\
@@ -55,6 +57,31 @@ def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,aut
     VALUES ("+str(idsensore)+",'"+tipo+"',"+str(operatore)+",'"+\
     datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+mystring+"');"
     return Query_Insert
+def Richiesta_remwsgwy (framedati):
+    #funzione di colloquio con il remws: manda la dichiesta e decodifica la risposta
+    richiesta={
+        'header':{'id': 10},
+        'data':{'sensors_list':[framedati]}
+        }
+    try:
+        r=requests.post(url,data=js.dumps(richiesta))
+
+    except:
+        print("Errore: REMWS non raggiungibile", end="\r")
+    risposta=js.loads(r.text)
+    ci_sono_dati=False
+    #controllo progressivamente se la risposta è buona e se ci sono dati
+    outcome=risposta['data']['outcome']
+    if (outcome==0):
+        if (len(risposta['data']['sensor_data_list'])>0):
+            ci_sono_dati=True
+    else:
+        return []
+    if(ci_sono_dati):
+        # estraggo il dato
+        return risposta['data']['sensor_data_list'][0]['data']
+    else:
+        return []
 ###
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
@@ -90,47 +117,28 @@ for row in df_section.itertuples():
     frame_dati["sensor_id"]=row.idsensore
     # assegno operatore e funzione corretti
     if(row.nometipologia=='PP' or row.nometipologia=='N'):
-            id_operatore=4
-            function=3
+        id_operatore=4
+        function=3
     else:
-            id_operatore=1
-            function=1
+         id_operatore=1
+         function=1
+    #selezione del valore orario se la frequenza è 60
+    if(row.frequenza==60):
+        id_periodo=3
+    else:
+        id_periodo=1
     frame_dati["operator_id"]=id_operatore
     frame_dati["function_id"]=function
-    richiesta={
-        'header':{'id': 10},
-        'data':{'sensors_list':[frame_dati]}
-        }
-    #print (richiesta)
-    try:
-        r=requests.post(url,data=js.dumps(richiesta))
-
-    except:
-        print("Errore: REMWS non raggiungibile", end="\r")
-    risposta=js.loads(r.text)
-    ci_sono_dati=False
-    #controllo progressivamente se la risposta è buona e se ci sono dati
-    outcome=risposta['data']['outcome']
-    if (outcome==0):
-        if (len(risposta['data']['sensor_data_list'])>0):
-            ci_sono_dati=True
-    if(ci_sono_dati):
-        # estraggo il dato
-        aa=risposta['data']['sensor_data_list'][0]['data']
-        #se contiene almeno tre elementi c'è anche il dato
-        if (len(aa)>2):
-            misura=aa[1]['datarow'].split(";")[1]
-            #print(row.idsensore, misura)
-
-            QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
-            row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
-
-            try:
-                conn.execute(QueryInsert)
-
-            except:
-                print("Query non riuscita! per ",row.idsensore)
-
+    aa=Richiesta_remwsgwy(frame_dati)
+    if (len(aa)>2):
+        # prendo solo il primo element
+        misura=aa[1]['datarow'].split(";")[1]
+        QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
+        row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
+        try:
+            conn.execute(QueryInsert)
+        except:
+            print("Query non riuscita! per ",row.idsensore)
     else:
         print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
 print(s,dt.datetime.now())
