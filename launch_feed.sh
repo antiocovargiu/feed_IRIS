@@ -8,13 +8,13 @@ nomescript=${0##*/}
 while [ 1 ]
 do
    data_corrente=$[ 10#$(date +"%M") % 10 ]
-   if [ $data_corrente == $1 && $2 != 'R' ]
+   if [ $data_corrente == $1 ] && [ $2 != "R" ]
    then
       python3 feed_iris.py
    else
      sleep 30
    fi
-   if [ $2 == 'R']
+   if [ $2 == "R"]
    then
      python3 feed_iris_recupero.py
      sleep 3600
