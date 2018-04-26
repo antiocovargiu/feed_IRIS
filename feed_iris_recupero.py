@@ -121,7 +121,7 @@ for row in df_section.itertuples():
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
     # assegno operatore e funzione corretti
-    if(row.nometipologia=='PP' or row.nometipologia=='N'):
+    if(row.nometipologia=='PP'):
         id_operatore=4
         function=3
     else:
