@@ -131,7 +131,7 @@ for row in df_section.itertuples():
     if(row.frequenza==60):
         id_periodo=3
         PERIODO=int(MINUTES/60)
-        attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='60min')
+        attesi=pd.date_range(dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0), periods=PERIODO,freq='60min')
     else:
         id_periodo=1
         PERIODO=int(MINUTES/10)
@@ -144,6 +144,7 @@ for row in df_section.itertuples():
         frame_dati["finish"]=dato_mancante.strftime("%Y-%m-%d %H:%M")
         frame_dati["operator_id"]=id_operatore
         frame_dati["function_id"]=function
+        frame_dati["granularity"]=id_periodo
         aa=Richiesta_remwsgwy(frame_dati)
         if (len(aa)>2):
         # prendo solo il primo element

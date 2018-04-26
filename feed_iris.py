@@ -99,7 +99,7 @@ df_sensori=pd.read_sql(Query, conn)
 # selezione dell'ora
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
-
+ora=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0)
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
 #ciclo sui sensori:
 # strutturo la richiesta
@@ -126,10 +126,15 @@ for row in df_section.itertuples():
     #selezione del valore orario se la frequenza è 60
     if(row.frequenza==60):
         id_periodo=3
+        frame_dati["start"]=ora.strftime("%Y-%m-%d %H:%M")
+        frame_dati["finish"]=ora.strftime("%Y-%m-%d %H:%M")
     else:
         id_periodo=1
+        frame_dati["start"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
+        frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
     frame_dati["operator_id"]=id_operatore
     frame_dati["function_id"]=function
+    frame_dati["granularity"]=id_periodo
     aa=Richiesta_remwsgwy(frame_dati)
     if (len(aa)>2):
         # prendo solo il primo element
