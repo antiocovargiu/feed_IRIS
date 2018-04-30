@@ -111,6 +111,7 @@ df_dati=pd.read_sql(QueryDati, conn)
 # selezione dell'ora
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
+data_elimina=data_ricerca - dt.timedelta(days=15)
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
 #ciclo sui sensori:
 # strutturo la richiesta
@@ -162,9 +163,19 @@ for row in df_section.itertuples():
             row.idsensore,row.nometipologia,id_operatore,dato_mancante,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
-                print("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                if (DEBUG):
+                    print("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
-                print("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                if (DEBUG):
+                    print("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
         else:
-            print ("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
+            if (DEBUG):
+                print ("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
+QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
+try:
+    conn.execute(QueryDelete)
+    if (DEBUG):
+        print("+++pulizia dati eseguita")
+except:
+    print("ERR: Pulizia dati non riuscita")
 print(s,dt.datetime.now())

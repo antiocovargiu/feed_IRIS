@@ -154,8 +154,12 @@ for row in df_section.itertuples():
         row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
         try:
             conn.execute(QueryInsert)
+            if (DEBUG):
+                print("+++",row.idsensore,data_ricerca,misura)
         except:
-            print("Query non riuscita! per ",row.idsensore)
+            if(DEBUG):
+                print("Query non riuscita! per ",row.idsensore)
     else:
-        print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+        if (DEBUG):
+            print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
 print(s,dt.datetime.now())
