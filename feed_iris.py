@@ -82,7 +82,7 @@ def Richiesta_remwsgwy (framedati):
                         ora=k[0]
                         misura=k[1]
                         valido=k[2]
-                        if(int(valido)>0):
+                        if(int(valido)>=0):
                             ci_sono_dati=True
                  # chiude ciclo esame dati           
         else:
