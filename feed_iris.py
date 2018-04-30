@@ -75,12 +75,21 @@ def Richiesta_remwsgwy (framedati):
         outcome=risposta['data']['outcome']
         if (outcome==0):
             if (len(risposta['data']['sensor_data_list'])>0):
-                ci_sono_dati=True
+                candidate=risposta['data']['sensor_data_list'][0]['data']
+                for j in candidate:
+                    k=j['datarow'].split(";")
+                    if (len(k)==3):
+                        ora=k[0]
+                        misura=k[1]
+                        valido=k[2]
+                        if(int(valido)>0):
+                            ci_sono_dati=True
+                 # chiude ciclo esame dati           
         else:
             return []
     if(ci_sono_dati):
         # estraggo il dato
-        return risposta['data']['sensor_data_list'][0]['data']
+        return candidate
     else:
         return []
 ###
@@ -137,8 +146,10 @@ for row in df_section.itertuples():
     frame_dati["granularity"]=id_periodo
     aa=Richiesta_remwsgwy(frame_dati)
     if (len(aa)>2):
-        # prendo solo il primo element
+        # prendo solo il primo elemento
         misura=aa[1]['datarow'].split(";")[1]
+        valido=aa[1]['datarow'].split(";")[2]
+        
         QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
         row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
         try:
