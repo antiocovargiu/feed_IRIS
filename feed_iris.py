@@ -84,7 +84,7 @@ def Richiesta_remwsgwy (framedati):
                         valido=k[2]
                         if(int(valido)>=0):
                             ci_sono_dati=True
-                 # chiude ciclo esame dati           
+                 # chiude ciclo esame dati
         else:
             return []
     if(ci_sono_dati):
@@ -98,7 +98,7 @@ engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'
 conn=engine.connect()
 
 #preparazione dell'elenco dei sensori
-Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,4);'
+Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
 
 #ALIMETAZIONE DIRETTA
@@ -156,7 +156,7 @@ for row in df_section.itertuples():
         # prendo solo il primo elemento
         misura=aa[1]['datarow'].split(";")[1]
         valido=aa[1]['datarow'].split(";")[2]
-        
+
         QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
         row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
         try:

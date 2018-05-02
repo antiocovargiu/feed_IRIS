@@ -83,7 +83,7 @@ def Richiesta_remwsgwy (framedati):
                         valido=k[2]
                         if(int(valido)>=0):
                             ci_sono_dati=True
-                 # chiude ciclo esame dati           
+                 # chiude ciclo esame dati
         else:
             return []
     if(ci_sono_dati):
@@ -97,7 +97,7 @@ engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'
 conn=engine.connect()
 
 #preparazione dell'elenco dei sensori
-Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,4);'
+Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
 
 #query di richiesta dati già presenti nel dB
