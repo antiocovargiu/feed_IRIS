@@ -126,9 +126,16 @@ conn=engine.connect()
 for row in df_section.itertuples():
     frame_dati["sensor_id"]=row.idsensore
     # assegno operatore e funzione corretti
+    # riepilogo casi:
+    # frequenza 1 minuti (pluviometro CAE): function=3, idperiodo=1
+    # frequenza 5 minuti (pluviometri ETG): function=3, idperiodo=1
+    # frequenza 10 minuti (pluviometri PA): function=1, idperiodo=1
+    #
     if(row.nometipologia=='PP'):
         id_operatore=4
         function=3
+        if(row.frequenza==10):
+            function=1
     else:
          id_operatore=1
          function=1
