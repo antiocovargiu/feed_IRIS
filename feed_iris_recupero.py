@@ -180,4 +180,4 @@ try:
         print("+++pulizia dati eseguita")
 except:
     print("ERR: Pulizia dati non riuscita")
-print(s,dt.datetime.now())
+print(s,h, dt.datetime.now())

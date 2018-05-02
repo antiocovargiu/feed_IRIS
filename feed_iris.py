@@ -169,4 +169,4 @@ for row in df_section.itertuples():
     else:
         if (DEBUG):
             print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
-print(s,dt.datetime.now())
+print(s,h,dt.datetime.now())
