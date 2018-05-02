@@ -134,7 +134,7 @@ for row in df_section.itertuples():
     if(row.nometipologia=='PP'):
         id_operatore=4
         function=3
-          if(row.frequenza==10):
+        if(row.frequenza==10):
             function=1
     else:
          id_operatore=1
