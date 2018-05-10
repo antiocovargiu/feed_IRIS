@@ -18,7 +18,7 @@ import requests
 # variabili di ambiente (da togliere in produzione)
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
-DEBUG=False
+#DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
@@ -31,6 +31,7 @@ if (AUTORE==None):
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
     IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
+    DEBUG=os.getenv('DEBUG')
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date
@@ -155,7 +156,7 @@ for row in df_section.itertuples():
     if (len(aa)>2):
         # prendo solo il primo elemento
         misura=aa[1]['datarow'].split(";")[1]
-        valido=aa[1]['datarow'].split(";")[2]
+        h=valido=aa[1]['datarow'].split(";")[2]
 
         QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
         row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
@@ -169,4 +170,27 @@ for row in df_section.itertuples():
     else:
         if (DEBUG):
             print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+    # prima di chiudere il ciclo chiedo la raffica del vento
+    if(row.nometipologia=='VV' or row.nometipologia=='DV'):
+        id_operatore=3         
+        frame_dati["operator_id"]=id_operatore
+        aa=Richiesta_remwsgwy(frame_dati)
+        if (len(aa)>2):
+        # prendo solo il primo elemento
+            misura=aa[1]['datarow'].split(";")[1]
+            valido=aa[1]['datarow'].split(";")[2]
+            QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
+            row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
+            try:
+                conn.execute(QueryInsert)
+                if (DEBUG):
+                    print("+++",row.idsensore,data_ricerca,misura)
+            except:
+                        if(DEBUG):
+                            print("Query non riuscita! per ",row.idsensore)
+        else:
+            if (DEBUG):
+                print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+    #fine ciclo sensore
+        
 print(s,h,dt.datetime.now())
