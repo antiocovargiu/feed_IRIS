@@ -18,7 +18,7 @@ import requests
 # variabili di ambiente (da togliere in produzione)
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
-DEBUG=False
+#DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
@@ -64,7 +64,7 @@ def Richiesta_remwsgwy (framedati):
         'data':{'sensors_list':[framedati]}
         }
     try:
-        r=requests.post(url,data=js.dumps(richiesta))
+        r=requests.post(url,data=js.dumps(richiesta),timeout=5)
 
     except:
         print("Errore: REMWS non raggiungibile", end="\r")

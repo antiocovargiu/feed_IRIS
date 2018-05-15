@@ -22,10 +22,9 @@ url=REMWS_GATEWAY
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
-MINUTES=120 # minuti di recupero
+MINUTES=10 # minuti di recupero 
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
-    MINUTES=0 # minuti di recupero in caso GMT+0
     IRIS_USER_ID=os.getenv('IRIS_USER_ID')
     IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
@@ -34,8 +33,8 @@ if (AUTORE==None):
     DEBUG=os.getenv('DEBUG')
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
-# inizializzazione delle date
-datafine=dt.datetime.now()
+# inizializzazione delle date: datafine è in UTC+1
+datafine=dt.datetime.utcnow()+dt.timedelta(minutes=60)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
@@ -65,7 +64,7 @@ def Richiesta_remwsgwy (framedati):
         'data':{'sensors_list':[framedati]}
         }
     try:
-        r=requests.post(url,data=js.dumps(richiesta))
+        r=requests.post(url,data=js.dumps(richiesta),timeout=5)
 
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
