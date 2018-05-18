@@ -22,7 +22,7 @@ url=REMWS_GATEWAY
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
-MINUTES=10 # minuti di recupero 
+MINUTES=0 # minuti di recupero 
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
     IRIS_USER_ID=os.getenv('IRIS_USER_ID')
@@ -31,6 +31,7 @@ if (AUTORE==None):
     IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
     DEBUG=os.getenv('DEBUG')
+    MINUTES=int(os.getenv('MINUTES')) #il valore viene sovrascritto dalla variabile d'ambiente (paramentro in launch_feed.sh)
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date: datafine è in UTC+1
@@ -139,6 +140,11 @@ for row in df_section.itertuples():
     else:
          id_operatore=1
          function=1
+    # selezione degli idrometri con frequenza 5 minuti
+    if (row.frequenza==5):
+      id_operatore=1
+      id_periodo=10
+      function=1
     #selezione del valore orario se la frequenza è 60
     if(row.frequenza==60):
         id_periodo=3
@@ -191,5 +197,4 @@ for row in df_section.itertuples():
             if (DEBUG):
                 print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
     #fine ciclo sensore
-        
-print(s,h,dt.datetime.now())
+print("Alimentazione terminata per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())

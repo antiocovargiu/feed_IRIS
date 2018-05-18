@@ -31,6 +31,7 @@ if (AUTORE==None):
     IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
     DEBUG=os.getenv('DEBUG')
+    MINUTES=int(os.getenv('MINUTES'))
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date
@@ -131,10 +132,16 @@ for row in df_section.itertuples():
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
+    #frequenza 5 minuti
+    if(row.frequenza==5):
+        id_periodo=10
+        function=1
+        id_operatore=1
     # assegno operatore e funzione corretti
     if(row.nometipologia=='PP'):
         id_operatore=4
         function=3
+        id_periodo=1
         if(row.frequenza==10):
             function=1
     else:
@@ -203,4 +210,4 @@ try:
         print("+++pulizia dati eseguita")
 except:
     print("ERR: Pulizia dati non riuscita")
-print(s,h, dt.datetime.now())
+print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())

@@ -3,8 +3,14 @@
 #
 # il primo argomento è il minuto in cui eseguire il comando ogni 10 minuti
 # il secondo argomento è in caso di recupero: mettere comunque una lettera diversa da 'R'
-# in caso di recupero esegue lo script e si ferma per un'ora
+# in caso di recupero esegue lo script e POI si ferma per un tempo determinato dal terzo parametro
 nomescript=${0##*/}
+if [ $3 > 0 ]
+then
+   dormi=$3
+else
+  dormi=3600
+fi
 while [ 1 ]
 do
    data_corrente=$[ 10#$(date +"%M") % 10 ]
@@ -19,6 +25,6 @@ do
    then
      echo "Eeguo recupero per $TIPOLOGIE"
      python3 feed_iris_recupero.py
-     sleep 3600
+     sleep $dormi
    fi
 done
