@@ -151,7 +151,13 @@ for row in df_section.itertuples():
         frame_dati["start"]=ora.strftime("%Y-%m-%d %H:%M")
         frame_dati["finish"]=ora.strftime("%Y-%m-%d %H:%M")
     else:
-        id_periodo=1
+    # selezione degli idrometri con frequenza 5 minuti
+        if (row.frequenza==5):
+             id_operatore=1
+             id_periodo=10
+        else:
+             function=1
+             id_periodo=1
         frame_dati["start"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
         frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
     frame_dati["operator_id"]=id_operatore

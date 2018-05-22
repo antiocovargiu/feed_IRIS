@@ -153,9 +153,16 @@ for row in df_section.itertuples():
         PERIODO=int(MINUTES/60)
         attesi=pd.date_range(dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0), periods=PERIODO,freq='60min')
     else:
-        id_periodo=1
-        PERIODO=int(MINUTES/10)
-        attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
+        if(row.frequenza==5):
+            id_periodo=10
+            function=1
+            id_operatore=1
+            PERIODO=int(MINUTES/5)
+            attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='5min')
+        else:    
+            id_periodo=1
+            PERIODO=int(MINUTES/10)
+            attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
     #ho selezionato il periodo atteso: estraggo il dataframe degli elementi attesi
     df=attesi.isin(element['data_e_ora'])
     #eseguo il ciclo di richiesta sui dati mancanti
