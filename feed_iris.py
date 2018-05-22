@@ -22,7 +22,7 @@ url=REMWS_GATEWAY
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
-MINUTES=0 # minuti di recupero 
+MINUTES=5 # minuti di recupero 
 if (AUTORE==None):
     AUTORE=os.getenv('HOSTNAME')
     IRIS_USER_ID=os.getenv('IRIS_USER_ID')
@@ -123,6 +123,7 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
 conn=engine.connect()
+regole={}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     frame_dati["sensor_id"]=row.idsensore
@@ -132,20 +133,7 @@ for row in df_section.itertuples():
     # frequenza 5 minuti (pluviometri ETG): function=3, idperiodo=1
     # frequenza 10 minuti (pluviometri PA): function=1, idperiodo=1
     #
-    if(row.nometipologia=='PP'):
-        id_operatore=4
-        function=3
-        if(row.frequenza==10):
-            function=1
-    else:
-         id_operatore=1
-         function=1
-    # selezione degli idrometri con frequenza 5 minuti
-    if (row.frequenza==5):
-      id_operatore=1
-      id_periodo=10
-      function=1
-    #selezione del valore orario se la frequenza è 60
+     # selezione degli idrometri con frequenza 5 minuti
     if(row.frequenza==60):
         id_periodo=3
         frame_dati["start"]=ora.strftime("%Y-%m-%d %H:%M")
@@ -159,7 +147,16 @@ for row in df_section.itertuples():
              function=1
              id_periodo=1
         frame_dati["start"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
-        frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
+        frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")     
+    if(row.nometipologia=='PP'):
+        id_operatore=4
+        function=3
+        if(row.frequenza>1):
+            function=1
+    else:
+         id_operatore=1
+         function=1
+            
     frame_dati["operator_id"]=id_operatore
     frame_dati["function_id"]=function
     frame_dati["granularity"]=id_periodo
@@ -180,7 +177,7 @@ for row in df_section.itertuples():
                 print("Query non riuscita! per ",row.idsensore)
     else:
         if (DEBUG):
-            print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+            print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore,data_ricerca, "ASSENTE nel REM")
     # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         

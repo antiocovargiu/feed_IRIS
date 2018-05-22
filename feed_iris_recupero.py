@@ -133,22 +133,7 @@ for row in df_section.itertuples():
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
     #frequenza 5 minuti
-    if(row.frequenza==5):
-        id_periodo=10
-        function=1
-        id_operatore=1
-    # assegno operatore e funzione corretti
-    if(row.nometipologia=='PP'):
-        id_operatore=4
-        function=3
-        id_periodo=1
-        if(row.frequenza==10):
-            function=1
-    else:
-         id_operatore=1
-         function=1
-    #selezione del valore orario se la frequenza è 60
-    if(row.frequenza==60):
+   if(row.frequenza==60):
         id_periodo=3
         PERIODO=int(MINUTES/60)
         attesi=pd.date_range(dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0), periods=PERIODO,freq='60min')
@@ -163,6 +148,18 @@ for row in df_section.itertuples():
             id_periodo=1
             PERIODO=int(MINUTES/10)
             attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
+    # assegno operatore e funzione corretti
+    if(row.nometipologia=='PP'):
+        id_operatore=4
+        function=3
+        id_periodo=1
+        if(row.frequenza>1):
+            function=1
+    else:
+         id_operatore=1
+         function=1
+    #selezione del valore orario se la frequenza è 60
+    
     #ho selezionato il periodo atteso: estraggo il dataframe degli elementi attesi
     df=attesi.isin(element['data_e_ora'])
     #eseguo il ciclo di richiesta sui dati mancanti
