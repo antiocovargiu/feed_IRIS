@@ -133,7 +133,7 @@ for row in df_section.itertuples():
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
     #frequenza 5 minuti
-   if(row.frequenza==60):
+    if(row.frequenza==60):
         id_periodo=3
         PERIODO=int(MINUTES/60)
         attesi=pd.date_range(dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0), periods=PERIODO,freq='60min')
