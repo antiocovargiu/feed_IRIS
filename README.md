@@ -34,9 +34,19 @@ docker run -d --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp -e "IRIS_USER_ID=p
 # note: uso di MINUTES
 L'uso combinato di *MINUTES* e *arg1* determina il comportamento dell'alimentazione/recupero.
 In particolare, nel caso dell'alimentazione diretta si suppone che non vi siano dati nel dB e quindi la query di inserimento fallisce solo se qualcun altro ha già inserito un valore (violazione della chiave primaria). In pratica, il funzionamento prevede che *MINUTES* sia *0* e che l'alimentazione avvenga al minuto *arg1*.
+
 Ovviamente, se *arg1* è troppo vicino al momento in cui le stazioni inviano i dati, l'interrogazione al remws riporterà "Dato non presente" e quindi non verrà fatto alcun inserimento.
+
 Se voglio usare *arg1* vicino a 0, il valore di °MINUTES* dovrà essere 10 o maggiore, in modo che venga chiesto il dato presente nel REM con marca temporale più vecchia di *MINUTES* minuti fa.
+
 Se *MINUTES* è *0* per ottenere il pacchetto dei 10 minuti correnti conviene porre *arg1* pari a 6-8.
+
 L'esecuzione di un'alimentazione ritardata (*MINUTES*>>0) può essere conveniente nel caso di sensori che sono sistematicamente in ritardo (es. sensori RRQA). In questo caso conviene impostare un recupero (*arg2*=R che peschi alcuni *MINUTES* minuti fa (es. *30*) e che venga lanciato ogni 10 minuti (ponendo *arg3* pari a 600).
+
 Per il *recupero* il valore di *MINUTES* deve essere 1440 (per recuperare i dati delle 24h precedenti) mentre *arg1* può essere un valore qualunque.
+
 Nel caso del recupero di 24h il valore di *arg3* (intervallo tra un'esecuzione e la successiva) va posto pari ad almeno 3600 secondi (che è il valore di default e può essere omesso)
+
+L'alimentazione diretta cerca il dato dall'ora solare all'indietro di *MINUTES* minuti.
+
+Il recupero cerca tutti i dati dall'ora UTC all'indietro di *MINUTES* minuti
