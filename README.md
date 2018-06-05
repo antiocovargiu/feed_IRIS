@@ -21,18 +21,27 @@ _arg3_ tempo in secondi tra una esecuzione e la successiva (*facoltativo, defaul
 
 # ENV
 Nel container sono già esplicitate le variabili d'ambiente di base:
+
 IRIS_USER_ID *postgres*
+
 IRIS_DB_NAME *iris_base*
+
 IRIS_DB_HOST *10.10.0.19*
+
 Devono essere specificate le variabili:
+
 DEBUG *True* scrive tutti gli errori o gli inserimenti dei dati, *False* scrive solo le informazioni essenziali
+
 TIPOLOGIE elenco delle tipologie per cui esegue l'alimentazione/recupero (*vedi esempio*)
+
 MINUTES numero di minuti che considera per il recupero o l'alimentazione diretta (*vedi note*)
+
 IRIS_USER_PWD password dell'utente IRIS_USER_ID
+
 
 # esempio
 ```
-docker run -d --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp -e "IRIS_USER_ID=postgres" -e "IRIS_USER_PWD=_password_" -e "IRIS_DB_NAME=iris_base" -e "IRIS_DB_HOST=10.10.0.19" -e "TIPOLOGIE=I PP T UR N RG PA VV DV" -e "DEBUG=True" -e "MINUTES=1440" --name "recupero_all" arpasmr/feed_iris ./launch_feed.sh 8 R 3600
+docker run -d --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp -e "IRIS_USER_ID=postgres" -e "IRIS_USER_PWD=<password>" -e "IRIS_DB_NAME=iris_base" -e "IRIS_DB_HOST=10.10.0.19" -e "TIPOLOGIE=I PP T UR N RG PA VV DV" -e "DEBUG=True" -e "MINUTES=1440" --name "recupero_all" arpasmr/feed_iris ./launch_feed.sh 8 R 3600
 ```
 # note: uso di MINUTES
 L'uso combinato di *MINUTES* e *arg1* determina il comportamento dell'alimentazione/recupero.
