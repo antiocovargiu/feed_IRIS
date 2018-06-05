@@ -13,8 +13,11 @@ Il recupero viene gestito dal launcher che accetta in ingresso tre parametri
 ```
 
 _arg1_ minuto al quale esegue il comando
+
 _arg2_ flag per recupero: *R* esegue il recupero, ogni altro carattere non esegue il recupero (es. *N*)
+
 _arg3_ tempo in secondi tra una esecuzione e la successiva (*facoltativo, default 3600*)
+
 
 # ENV
 Nel container sono già esplicitate le variabili d'ambiente di base:
