@@ -18,7 +18,7 @@ import requests
 # variabili di ambiente (da togliere in produzione)
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
-DEBUG=False
+DEBUG='False'
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
@@ -37,8 +37,8 @@ TIPOLOGIE=h.split()
 # inizializzazione delle date
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
-if (DEBUG):
-    print(DEBUG)
+if (eval(DEBUG)):
+    print(eval(DEBUG))
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
@@ -179,13 +179,13 @@ for row in df_section.itertuples():
             row.idsensore,row.nometipologia,id_operatore,dato_mancante,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
-                if (DEBUG):
+                if (eval(DEBUG)):
                     print("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
-                if (DEBUG):
+                if (eval(DEBUG)):
                     print("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
         else:
-            if (DEBUG):
+            if (eval(DEBUG)):
                 print ("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
      # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
@@ -200,19 +200,19 @@ for row in df_section.itertuples():
             row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
-                if (DEBUG):
+                if (eval(DEBUG)):
                     print("+++",row.idsensore,data_ricerca,misura)
             except:
-                        if(DEBUG):
+                        if(eval(DEBUG)):
                             print("Query non riuscita! per ",row.idsensore)
         else:
-            if (DEBUG):
+            if (eval(DEBUG)):
                 print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
     #fine ciclo sensore
 QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
 try:
     conn.execute(QueryDelete)
-    if (DEBUG):
+    if (eval(DEBUG)):
         print("+++pulizia dati eseguita")
 except:
     print("ERR: Pulizia dati non riuscita")
