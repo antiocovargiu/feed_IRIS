@@ -18,7 +18,7 @@ import requests
 # variabili di ambiente (da togliere in produzione)
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
-#DEBUG=False
+DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
@@ -35,8 +35,10 @@ if (AUTORE==None):
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
 # inizializzazione delle date
-datafine=dt.datetime.utcnow()
+datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
+if (DEBUG):
+    print(DEBUG)
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
@@ -133,7 +135,7 @@ for row in df_section.itertuples():
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
     #frequenza 5 minuti
-   if(row.frequenza==60):
+    if(row.frequenza==60):
         id_periodo=3
         PERIODO=int(MINUTES/60)
         attesi=pd.date_range(dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0), periods=PERIODO,freq='60min')
