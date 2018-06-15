@@ -71,6 +71,7 @@ def Richiesta_remwsgwy (framedati):
 
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
+        r=[]
     ci_sono_dati=False
     if(len(r.text)>0):
         risposta=js.loads(r.text)
