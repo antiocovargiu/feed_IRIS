@@ -171,7 +171,10 @@ for row in df_section.itertuples():
         frame_dati["operator_id"]=id_operatore
         frame_dati["function_id"]=function
         frame_dati["granularity"]=id_periodo
-        aa=Richiesta_remwsgwy(frame_dati)
+        try:
+            aa=Richiesta_remwsgwy(frame_dati)
+        except:
+            aa=[]
         if (len(aa)>2):
         # prendo solo il primo element
             misura=aa[1]['datarow'].split(";")[1]
@@ -191,7 +194,10 @@ for row in df_section.itertuples():
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         
         frame_dati["operator_id"]=id_operatore
-        aa=Richiesta_remwsgwy(frame_dati)
+        try:
+            aa=Richiesta_remwsgwy(frame_dati)
+        except:
+            aa=[]
         if (len(aa)>2):
         # prendo solo il primo elemento
             misura=aa[1]['datarow'].split(";")[1]
