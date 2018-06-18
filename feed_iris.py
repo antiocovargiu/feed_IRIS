@@ -127,6 +127,7 @@ regole={}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     frame_dati["sensor_id"]=row.idsensore
+    data_insert=data_ricerca
     # assegno operatore e funzione corretti
     # riepilogo casi:
     # frequenza 1 minuti (pluviometro CAE): function=3, idperiodo=1
@@ -138,6 +139,7 @@ for row in df_section.itertuples():
         id_periodo=3
         frame_dati["start"]=ora.strftime("%Y-%m-%d %H:%M")
         frame_dati["finish"]=ora.strftime("%Y-%m-%d %H:%M")
+        data_insert=ora
     else:
     # selezione degli idrometri con frequenza 5 minuti
         if (row.frequenza==5):
@@ -167,17 +169,17 @@ for row in df_section.itertuples():
         h=valido=aa[1]['datarow'].split(";")[2]
 
         QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
-        row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
+        row.idsensore,row.nometipologia,id_operatore,data_insert,misura,AUTORE)
         try:
             conn.execute(QueryInsert)
             if (DEBUG):
-                print("+++",row.idsensore,data_ricerca,misura)
+                print("+++",row.idsensore,data_insert,misura)
         except:
             if(DEBUG):
                 print("Query non riuscita! per ",row.idsensore)
     else:
         if (DEBUG):
-            print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore,data_ricerca, "ASSENTE nel REM")
+            print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore,data_insert, "ASSENTE nel REM")
     # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         
@@ -188,7 +190,7 @@ for row in df_section.itertuples():
             misura=aa[1]['datarow'].split(";")[1]
             valido=aa[1]['datarow'].split(";")[2]
             QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
-            row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
+            row.idsensore,row.nometipologia,id_operatore,data_insert,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
                 if (DEBUG):
