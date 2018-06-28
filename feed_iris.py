@@ -30,7 +30,7 @@ if (AUTORE==None):
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
     IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
-    DEBUG=os.getenv('DEBUG')
+    DEBUG=eval(os.getenv('DEBUG'))
     MINUTES=int(os.getenv('MINUTES')) #il valore viene sovrascritto dalla variabile d'ambiente (paramentro in launch_feed.sh)
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
