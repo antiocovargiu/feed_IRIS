@@ -35,6 +35,7 @@ if (AUTORE==None):
     MINUTES=int(os.getenv('MINUTES'))
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
+logger = logging.getLogger(__name__)
 # inizializzazione delle date
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
