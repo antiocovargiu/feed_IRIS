@@ -15,6 +15,7 @@ from sqlalchemy import *
 import datetime as dt
 import json as js
 import requests
+import logging
 # variabili di ambiente (da togliere in produzione)
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
@@ -93,7 +94,8 @@ def Richiesta_remwsgwy (framedati):
         else:
                 return []
     except:
-        print("Errore: REMWS non raggiungibile", end="\r")
+        print("Errore: REMWS non raggiungibile", end="\r\n")
+        logging.error("REMWSGWY non raggiungibile")
         return []
     
 ###
