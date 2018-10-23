@@ -66,36 +66,36 @@ def Richiesta_remwsgwy (framedati):
         'header':{'id': 10},
         'data':{'sensors_list':[framedati]}
         }
+    ci_sono_dati=False
     try:
         r=requests.post(url,data=js.dumps(richiesta),timeout=5)
-
+        if(len(r.text)>0):
+                risposta=js.loads(r.text)
+                #controllo progressivamente se la risposta è buona e se ci sono dati
+                outcome=risposta['data']['outcome']
+                if (outcome==0):
+                    if (len(risposta['data']['sensor_data_list'])>0):
+                        candidate=risposta['data']['sensor_data_list'][0]['data']
+                        for j in candidate:
+                            k=j['datarow'].split(";")
+                            if (len(k)==3):
+                                ora=k[0]
+                                misura=k[1]
+                                valido=k[2]
+                                if(int(valido)>=0):
+                                    ci_sono_dati=True
+                        # chiude ciclo esame dati
+        else:
+                return []
+        if(ci_sono_dati):
+                # estraggo il dato
+                return candidate
+        else:
+                return []
     except:
         print("Errore: REMWS non raggiungibile", end="\r")
-        r=[]
-    ci_sono_dati=False
-    if(len(r.text)>0):
-        risposta=js.loads(r.text)
-        #controllo progressivamente se la risposta è buona e se ci sono dati
-        outcome=risposta['data']['outcome']
-        if (outcome==0):
-            if (len(risposta['data']['sensor_data_list'])>0):
-                candidate=risposta['data']['sensor_data_list'][0]['data']
-                for j in candidate:
-                    k=j['datarow'].split(";")
-                    if (len(k)==3):
-                        ora=k[0]
-                        misura=k[1]
-                        valido=k[2]
-                        if(int(valido)>=0):
-                            ci_sono_dati=True
-                 # chiude ciclo esame dati
-        else:
-            return []
-    if(ci_sono_dati):
-        # estraggo il dato
-        return candidate
-    else:
         return []
+    
 ###
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
