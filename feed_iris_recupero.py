@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 if (eval(DEBUG)):
-    print(eval(DEBUG))
+    logging.debug(eval(DEBUG))
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
@@ -187,13 +187,13 @@ for row in df_section.itertuples():
             try:
                 conn.execute(QueryInsert)
                 if (eval(DEBUG)):
-                    print("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                    logging.info("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
                 if (eval(DEBUG)):
-                    print("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                    logging.error("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
         else:
             if (eval(DEBUG)):
-                print ("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                logging.warning("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
      # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         
@@ -211,19 +211,20 @@ for row in df_section.itertuples():
             try:
                 conn.execute(QueryInsert)
                 if (eval(DEBUG)):
-                    print("+++",row.idsensore,data_ricerca,misura)
+                    logging.info("+++",row.idsensore,data_ricerca,misura)
             except:
                         if(eval(DEBUG)):
-                            print("Query non riuscita! per ",row.idsensore)
+                            logging.error("Query non riuscita! per ",row.idsensore)
         else:
             if (eval(DEBUG)):
-                print ("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+                logging.warning("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
     #fine ciclo sensore
 QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
 try:
     conn.execute(QueryDelete)
     if (eval(DEBUG)):
-        print("+++pulizia dati eseguita")
+        logging.info("+++pulizia dati eseguita")
 except:
-    print("ERR: Pulizia dati non riuscita")
+    logging.error("ERR: Pulizia dati non riuscita")
 print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
+logging.info("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
