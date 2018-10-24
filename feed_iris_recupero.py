@@ -25,7 +25,7 @@ IRIS_SCHEMA_NAME='realtime'
 AUTORE=os.getenv('COMPUTERNAME')
 MINUTES= 1440 # minuti di recupero
 if (AUTORE==None):
-    AUTORE=os.getenv('HOSTNAME')
+    AUTORE=os.getenv('NAME')
     IRIS_USER_ID=os.getenv('IRIS_USER_ID')
     IRIS_USER_PWD=os.getenv('IRIS_USER_PWD')
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
