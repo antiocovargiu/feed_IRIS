@@ -38,6 +38,8 @@ MINUTES numero di minuti che considera per il recupero o l'alimentazione diretta
 
 IRIS_USER_PWD password dell'utente IRIS_USER_ID
 
+NAME nome dell'autore dell'inserimento
+
 
 # esempio
 ```
