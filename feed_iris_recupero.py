@@ -35,12 +35,11 @@ if (AUTORE==None):
     MINUTES=int(os.getenv('MINUTES'))
     # trasformo la stringa in lista
 TIPOLOGIE=h.split()
-logger = logging.getLogger(__name__)
 # inizializzazione delle date
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 if (eval(DEBUG)):
-    logger.debug(eval(DEBUG))
+    logging.debug(eval(DEBUG))
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
@@ -96,7 +95,7 @@ def Richiesta_remwsgwy (framedati):
                 return []
     except:
         print("Errore: REMWS non raggiungibile", end="\r\n")
-        logger.error("REMWSGWY non raggiungibile")
+        logging.error("REMWSGWY non raggiungibile")
         return []
     
 ###
@@ -187,13 +186,13 @@ for row in df_section.itertuples():
             try:
                 conn.execute(QueryInsert)
                 if (eval(DEBUG)):
-                    logger.info("+++++++Query eseguita per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                    logging.info("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
                 if (eval(DEBUG)):
-                    logger.error("Query non riuscita! per ",row.idsensore, dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                    logging.error("Query non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
         else:
             if (eval(DEBUG)):
-                logger.warning("Attenzione: dato di ", row.idsensore, " ASSENTE nel REM per", dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                logging.warning("Attenzione: dato di "+str(row.idsensore)+ " ASSENTE nel REM per "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
      # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         
@@ -211,20 +210,20 @@ for row in df_section.itertuples():
             try:
                 conn.execute(QueryInsert)
                 if (eval(DEBUG)):
-                    logger.info("+++",row.idsensore,data_ricerca,misura)
+                    logging.info("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
             except:
                         if(eval(DEBUG)):
-                            logger.error("Query non riuscita! per ",row.idsensore)
+                            logging.error("Query non riuscita! per "+str(row.idsensore))
         else:
             if (eval(DEBUG)):
-                logger.warning("Attenzione: dato di ",TIPOLOGIE, "sensore ", row.idsensore, "ASSENTE nel REM")
+                logging.warning("Attenzione: dato di "+h+ " sensore "+str( row.idsensore)+ " ASSENTE nel REM")
     #fine ciclo sensore
 QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
 try:
     conn.execute(QueryDelete)
     if (eval(DEBUG)):
-        logger.info("+++pulizia dati eseguita")
+        logging.info("+++pulizia dati eseguita")
 except:
-    logger.error("ERR: Pulizia dati non riuscita")
+    logging.error("ERR: Pulizia dati non riuscita")
 print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
-logger.info("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
+logging.info("Recupero terminato per "+h+" inizio "+s+" fine "+ dt.datetime.now())
