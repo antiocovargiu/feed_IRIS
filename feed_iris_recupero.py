@@ -189,7 +189,7 @@ for row in df_section.itertuples():
                     logging.info("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
                 if (eval(DEBUG)):
-                    logging.error("Query non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                    logging.error(QueryInsert+"non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
         else:
             if (eval(DEBUG)):
                 logging.warning("Attenzione: dato di "+str(row.idsensore)+ " ASSENTE nel REM per "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
@@ -226,4 +226,4 @@ try:
 except:
     logging.error("ERR: Pulizia dati non riuscita")
 print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
-logging.info("Recupero terminato per "+h+" inizio "+s+" fine "+ dt.datetime.now())
+logging.info("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
