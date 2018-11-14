@@ -65,16 +65,13 @@ def Richiesta_remwsgwy (framedati):
         'data':{'sensors_list':[framedati]}
         }
     try:
-        r=requests.post(url,data=js.dumps(richiesta),timeout=5)
-
-    except:
-        print("Errore: REMWS non raggiungibile", end="\r")
-    ci_sono_dati=False
-    if(len(r.text)>0):
-        risposta=js.loads(r.text)
-        #controllo progressivamente se la risposta è buona e se ci sono dati
-        outcome=risposta['data']['outcome']
-        if (outcome==0):
+       r=requests.post(url,data=js.dumps(richiesta),timeout=5)
+       ci_sono_dati=False
+       if(len(r.text)>0):
+          risposta=js.loads(r.text)
+          #controllo progressivamente se la risposta è buona e se ci sono dati
+          outcome=risposta['data']['outcome']
+          if (outcome==0):
             if (len(risposta['data']['sensor_data_list'])>0):
                 candidate=risposta['data']['sensor_data_list'][0]['data']
                 for j in candidate:
@@ -86,8 +83,11 @@ def Richiesta_remwsgwy (framedati):
                         if(int(valido)>=0):
                             ci_sono_dati=True
                  # chiude ciclo esame dati
-        else:
+       else:
             return []
+    except:
+        print("Errore: REMWS non raggiungibile", end="\r")
+    
     if(ci_sono_dati):
         # estraggo il dato
         return candidate
