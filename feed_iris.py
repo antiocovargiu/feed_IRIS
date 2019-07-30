@@ -64,9 +64,9 @@ def Richiesta_remwsgwy (framedati):
         'header':{'id': 10},
         'data':{'sensors_list':[framedati]}
         }
+    ci_sono_dati=False
     try:
        r=requests.post(url,data=js.dumps(richiesta),timeout=5)
-       ci_sono_dati=False
        if(len(r.text)>0):
           risposta=js.loads(r.text)
           #controllo progressivamente se la risposta è buona e se ci sono dati
