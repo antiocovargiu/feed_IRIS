@@ -19,8 +19,8 @@ import requests
 REMWS_GATEWAY='http://10.10.0.15:9099'
 url=REMWS_GATEWAY
 #DEBUG=False
-IRIS_TABLE_NAME='m_osservazioni_tr'
-IRIS_SCHEMA_NAME='realtime'
+IRIS_TABLE_NAME='M_Osservazioni_TR'
+IRIS_SCHEMA_NAME='METEO'
 AUTORE=os.getenv('COMPUTERNAME')
 MINUTES=5 # minuti di recupero 
 if (AUTORE==None):
@@ -54,7 +54,7 @@ def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,aut
     s=dt.datetime.now()
     mystring=s.strftime("%Y-%m-%d %H:%M")
     Query_Insert="INSERT into "+schema+"."+table+\
-    " (idsensore,nometipologia,idoperatore,data_e_ora,misura, autore,data)\
+    " (IDsensore,NomeTipologia,IDoperatore,Data_e_ora,Misura, Autore,Data)\
     VALUES ("+str(idsensore)+",'"+tipo+"',"+str(operatore)+",'"+\
     datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+mystring+"');"
     return Query_Insert
@@ -95,12 +95,25 @@ def Richiesta_remwsgwy (framedati):
         return []
 ###
 #FASE 2 - query al dB
-engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
+#engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
+#conn=engine.connect()
+engine = create_engine('mysql+mysqlconnector://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME+'?charset=utf8')
 conn=engine.connect()
 
+
 #preparazione dell'elenco dei sensori
-Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
-df_sensori=pd.read_sql(Query, conn)
+#Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
+#df_sensori=pd.read_sql(Query, conn)
+Query2='Select A_Sensori.IDsensore as idsensore, NOMEtipologia as nometipologia, AggregazioneTemporale as frequenza from A_Sensori join A_Stazioni \
+on A_Sensori.IDstazione=A_Stazioni.IDstazione \
+join A_Sensori2Destinazione \
+on A_Sensori.IDsensore=A_Sensori2Destinazione.IDsensore \
+where IDrete in (1,2,4) \
+and A_Sensori.DataFine is Null and Destinazione=12;'
+df_sensori=pd.read_sql(Query2, conn)
+
+
+
 
 #ALIMETAZIONE DIRETTA
 # suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
