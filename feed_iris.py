@@ -113,9 +113,9 @@ df_sensori=pd.read_sql(Query, conn)
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
 ora=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0)
-df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
-# sort casuale per parallelizzazione
-df_section.sample(frac=1)
+df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
+# aggiunto sort casuale per parallelizzazione
+
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
