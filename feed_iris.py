@@ -133,8 +133,8 @@ regole={}
 for row in df_section.itertuples():
     # controllo quanto tempo è passato: le alimentazioni possono durare al massimo 10'
     timeDiff=dt.datetime.now()-s
-    timeDiff.total_seconds() / 60
-    if (timeDiff>10):
+    durata_script=timeDiff.total_seconds() / 60
+    if (durata_script>10):
         sys.exit("Esecuzione troppo lunga - interrompo!")
     frame_dati["sensor_id"]=row.idsensore
     data_insert=data_ricerca
