@@ -8,7 +8,7 @@
 
 # FASE 1
 #inizializzazione
-import os
+import os,sys
 import pandas as pd
 # import numpy as np
 from sqlalchemy import *
