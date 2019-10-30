@@ -18,7 +18,8 @@ do
    then
      logger -is -p user.notice "$nomescript: eseguo alimentazione al minuto $1 per $TIPOLOGIE"
      echo "Eseguo alimentazione diretta per $TIPOLOGIE"
-      python3 feed_iris.py
+     sleep $((1 + RANDOM % 120))
+     python3 feed_iris.py
    else
      sleep 30
    fi
