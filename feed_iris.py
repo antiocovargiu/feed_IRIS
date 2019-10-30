@@ -8,7 +8,7 @@
 
 # FASE 1
 #inizializzazione
-import os
+import os,sys
 import pandas as pd
 # import numpy as np
 from sqlalchemy import *
@@ -16,8 +16,7 @@ import datetime as dt
 import json as js
 import requests
 # variabili di ambiente (da togliere in produzione)
-REMWS_GATEWAY='http://10.10.0.15:9099'
-url=REMWS_GATEWAY
+
 #DEBUG=False
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
@@ -32,7 +31,10 @@ if (AUTORE==None):
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
     DEBUG=eval(os.getenv('DEBUG'))
     MINUTES=int(os.getenv('MINUTES')) #il valore viene sovrascritto dalla variabile d'ambiente (paramentro in launch_feed.sh)
+    REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
     # trasformo la stringa in lista
+
+url=REMWS_GATEWAY    
 TIPOLOGIE=h.split()
 # inizializzazione delle date: datafine è in UTC+1
 datafine=dt.datetime.utcnow()+dt.timedelta(minutes=60)
@@ -102,6 +104,7 @@ conn=engine.connect()
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
 
+
 #ALIMETAZIONE DIRETTA
 # suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
 # Se l'inserimento fallisce vuol dire che qualcun altro ha inserito il dato (ovvero un processo in parallelo, il che èstrano...)
@@ -110,7 +113,9 @@ df_sensori=pd.read_sql(Query, conn)
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
 ora=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0)
-df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
+df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
+# aggiunto sort casuale per parallelizzazione
+
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
@@ -126,6 +131,11 @@ conn=engine.connect()
 regole={}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
+    # controllo quanto tempo è passato: le alimentazioni possono durare al massimo 10'
+    timeDiff=dt.datetime.now()-s
+    durata_script=timeDiff.total_seconds() / 60
+    if (durata_script>10):
+        sys.exit("Esecuzione troppo lunga - interrompo!")
     frame_dati["sensor_id"]=row.idsensore
     data_insert=data_ricerca
     # assegno operatore e funzione corretti

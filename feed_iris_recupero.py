@@ -17,8 +17,6 @@ import json as js
 import requests
 import logging
 # variabili di ambiente (da togliere in produzione)
-REMWS_GATEWAY='http://10.10.0.15:9099'
-url=REMWS_GATEWAY
 DEBUG='False'
 IRIS_TABLE_NAME='m_osservazioni_tr'
 IRIS_SCHEMA_NAME='realtime'
@@ -33,7 +31,10 @@ if (AUTORE==None):
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
     DEBUG=os.getenv('DEBUG')
     MINUTES=int(os.getenv('MINUTES'))
+    REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
     # trasformo la stringa in lista
+
+url=REMWS_GATEWAY
 TIPOLOGIE=h.split()
 # inizializzazione delle date
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
