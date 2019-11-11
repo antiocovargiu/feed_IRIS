@@ -32,7 +32,7 @@ if (AUTORE==None):
     DEBUG=eval(os.getenv('DEBUG'))
     MINUTES=int(os.getenv('MINUTES')) #il valore viene sovrascritto dalla variabile d'ambiente (paramentro in launch_feed.sh)
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
-    TIMEOUT=os.getenv('TIMEOUT')
+    TIMEOUT=int(os.getenv('TIMEOUT'))
     # trasformo la stringa in lista
 if (DEBUG):
     print("...inizio processo...")
