@@ -32,6 +32,7 @@ if (AUTORE==None):
     DEBUG=eval(os.getenv('DEBUG'))
     MINUTES=int(os.getenv('MINUTES')) #il valore viene sovrascritto dalla variabile d'ambiente (paramentro in launch_feed.sh)
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
+    TIMEOUT=os.getenv('TIMEOUT')
     # trasformo la stringa in lista
 
 url=REMWS_GATEWAY    
@@ -68,7 +69,7 @@ def Richiesta_remwsgwy (framedati):
         }
     ci_sono_dati=False
     try:
-       r=requests.post(url,data=js.dumps(richiesta),timeout=1)
+       r=requests.post(url,data=js.dumps(richiesta),timeout=TIMEOUT)
        if(len(r.text)>0):
           risposta=js.loads(r.text)
           #controllo progressivamente se la risposta è buona e se ci sono dati
