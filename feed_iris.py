@@ -108,7 +108,7 @@ conn=engine.connect()
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
 if (eval(DEBUG)):
-    print("...accesso al dB sensori eseguito...")          
+    print("...accesso al dB sensori eseguito....")          
 
 #ALIMETAZIONE DIRETTA
 # suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
