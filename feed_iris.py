@@ -34,7 +34,8 @@ if (AUTORE==None):
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
     TIMEOUT=os.getenv('TIMEOUT')
     # trasformo la stringa in lista
-
+if (eval(DEBUG)):
+    print("...inizio processo...")
 url=REMWS_GATEWAY    
 TIPOLOGIE=h.split()
 # inizializzazione delle date: datafine è in UTC+1
@@ -63,6 +64,7 @@ def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,aut
     return Query_Insert
 def Richiesta_remwsgwy (framedati):
     #funzione di colloquio con il remws: manda la dichiesta e decodifica la risposta
+    global TIMEOUT
     richiesta={
         'header':{'id': 10},
         'data':{'sensors_list':[framedati]}
@@ -97,6 +99,7 @@ def Richiesta_remwsgwy (framedati):
     else:
         return []
 ###
+
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
 conn=engine.connect()
@@ -104,7 +107,8 @@ conn=engine.connect()
 #preparazione dell'elenco dei sensori
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
-
+if (eval(DEBUG)):
+    print("...accesso al dB sensori eseguito...")          
 
 #ALIMETAZIONE DIRETTA
 # suppongo di non avere ancora chisto dati, vedo qule dato devo chiedere, lo chiedo e loinserisco.
@@ -116,7 +120,8 @@ data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,dataini
 ora=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0)
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
 # aggiunto sort casuale per parallelizzazione
-
+if (eval(DEBUG)):
+    print("...inizio ciclo sensori...")          
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
