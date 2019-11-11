@@ -32,7 +32,7 @@ if (AUTORE==None):
     DEBUG=os.getenv('DEBUG')
     MINUTES=int(os.getenv('MINUTES'))
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
-    TIMEOUT=os.getenv('TIMEOUT')
+    TIMEOUT=int(os.getenv('TIMEOUT'))
     # trasformo la stringa in lista
 
 url=REMWS_GATEWAY
