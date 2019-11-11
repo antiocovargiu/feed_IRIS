@@ -8,7 +8,7 @@
 
 # FASE 1
 #inizializzazione
-import os
+import os,sys
 import pandas as pd
 # import numpy as np
 from sqlalchemy import *
@@ -41,6 +41,7 @@ datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
 if (eval(DEBUG)):
     logging.debug(eval(DEBUG))
+    print(f"Inizio attività di {AUTORE}")
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
 def seleziona_richiesta(Risposta):
@@ -100,6 +101,8 @@ def Richiesta_remwsgwy (framedati):
         return []
     
 ###
+if (eval(DEBUG)):
+    print("...inizio richiesta db...")
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
 conn=engine.connect()
@@ -122,7 +125,8 @@ data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,dataini
 data_elimina=data_ricerca - dt.timedelta(days=15)
 # aggiunto sort casuale per parallelizzazione
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
-
+if (eval(DEBUG)):
+    print("...inizio ciclo sensori...")
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
@@ -225,8 +229,8 @@ QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHE
 try:
     conn.execute(QueryDelete)
     if (eval(DEBUG)):
-        logging.info("+++pulizia dati eseguita")
+       print("...pulizia dati eseguita")
 except:
     logging.error("ERR: Pulizia dati non riuscita")
-print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
+print(f"Recupero terminato per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
 logging.info("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
