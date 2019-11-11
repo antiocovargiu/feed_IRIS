@@ -40,8 +40,7 @@ TIPOLOGIE=h.split()
 # inizializzazione delle date
 datafine=dt.datetime.utcnow()+dt.timedelta(hours=1)
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
-if (eval(DEBUG)):
-    logging.debug(eval(DEBUG))
+if (DEBUG):
     print(f"Inizio attività di {AUTORE}")
 #definizione delle funzioni
 # la funzione legge il blocco di dati e lo trasforma in DataFrame
@@ -97,12 +96,11 @@ def Richiesta_remwsgwy (framedati):
         else:
                 return []
     except:
-        print("Errore: REMWS non raggiungibile", end="\r\n")
-        logging.error("REMWSGWY non raggiungibile")
+        print("Errore: REMWS non raggiungibile", file=sys.stderr)
         return []
     
 ###
-if (eval(DEBUG)):
+if (DEBUG):
     print("...inizio richiesta db...")
 #FASE 2 - query al dB
 engine = create_engine('postgresql+pg8000://'+IRIS_USER_ID+':'+IRIS_USER_PWD+'@'+IRIS_DB_HOST+'/'+IRIS_DB_NAME)
@@ -126,7 +124,7 @@ data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,dataini
 data_elimina=data_ricerca - dt.timedelta(days=15)
 # aggiunto sort casuale per parallelizzazione
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
-if (eval(DEBUG)):
+if (DEBUG):
     print("...inizio ciclo sensori...")
 #ciclo sui sensori:
 # strutturo la richiesta
@@ -193,14 +191,14 @@ for row in df_section.itertuples():
             row.idsensore,row.nometipologia,id_operatore,dato_mancante,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
-                if (eval(DEBUG)):
-                    logging.info("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                if (DEBUG):
+                    print("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
-                if (eval(DEBUG)):
-                    logging.error(QueryInsert+"non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
+                if (DEBUG):
+                    print(QueryInsert+"non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"),file=sys.stderr)
         else:
-            if (eval(DEBUG)):
-                logging.warning("Attenzione: dato di "+str(row.idsensore)+ " ASSENTE nel REM per "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
+            if (DEBUG):
+                print("Attenzione: dato di "+str(row.idsensore)+ " ASSENTE nel REM per "+ dato_mancante.strftime("%Y-%m-%d %H:%M"),file=sys.stderr)
      # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
         id_operatore=3         
@@ -217,21 +215,21 @@ for row in df_section.itertuples():
             row.idsensore,row.nometipologia,id_operatore,data_ricerca,misura,AUTORE)
             try:
                 conn.execute(QueryInsert)
-                if (eval(DEBUG)):
-                    logging.info("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
+                if (DEBUG):
+                    print ("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
             except:
-                        if(eval(DEBUG)):
-                            logging.error("Query non riuscita! per "+str(row.idsensore))
+                        if(DEBUG):
+                            print(f"Query non riuscita! per {str(row.idsensore)}",file=sys.stderr)
         else:
-            if (eval(DEBUG)):
-                logging.warning("Attenzione: dato di "+h+ " sensore "+str( row.idsensore)+ " ASSENTE nel REM")
+            if (DEBUG):
+                print("Attenzione: dato di "+h+ " sensore "+str( row.idsensore)+ " ASSENTE nel REM",file=sys.stderr)
     #fine ciclo sensore
 QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
 try:
     conn.execute(QueryDelete)
-    if (eval(DEBUG)):
+    if (DEBUG):
        print("...pulizia dati eseguita")
 except:
-    logging.error("ERR: Pulizia dati non riuscita")
+    print ("ERRORE: Pulizia dati non riuscita",file=sys.stderr)
 print(f"Recupero terminato per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
-logging.info("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
+print("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
