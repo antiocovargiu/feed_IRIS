@@ -34,7 +34,7 @@ if (AUTORE==None):
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
     TIMEOUT=os.getenv('TIMEOUT')
     # trasformo la stringa in lista
-if (eval(DEBUG)):
+if (DEBUG):
     print("...inizio processo...")
 url=REMWS_GATEWAY    
 TIPOLOGIE=h.split()
@@ -107,7 +107,7 @@ conn=engine.connect()
 #preparazione dell'elenco dei sensori
 Query='Select *  from "dati_di_base"."anagraficasensori" where "anagraficasensori"."datafine" is NULL and idrete in (1,2,4);'
 df_sensori=pd.read_sql(Query, conn)
-if (eval(DEBUG)):
+if (DEBUG):
     print("...accesso al dB sensori eseguito....")          
 
 #ALIMETAZIONE DIRETTA
@@ -120,7 +120,7 @@ data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,dataini
 ora=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,0,0)
 df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
 # aggiunto sort casuale per parallelizzazione
-if (eval(DEBUG)):
+if (DEBUG):
     print("...inizio ciclo sensori...")          
 #ciclo sui sensori:
 # strutturo la richiesta
