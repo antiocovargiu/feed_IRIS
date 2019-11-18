@@ -96,9 +96,10 @@ def Richiesta_remwsgwy (framedati):
         else:
                 return []
     except:
-        print("Errore: REMWS non raggiungibile", file=sys.stderr)
+        if(DEBUG):
+            print("Errore: REMWS non raggiungibile", file=sys.stderr)
         return []
-    
+
 ###
 if (DEBUG):
     print("...inizio richiesta db...")
@@ -138,11 +139,13 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
 conn=engine.connect()
+esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
+
     #frequenza 5 minuti
     if(row.frequenza==60):
         id_periodo=3
@@ -155,7 +158,7 @@ for row in df_section.itertuples():
             id_operatore=1
             PERIODO=int(MINUTES/5)
             attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='5min')
-        else:    
+        else:
             id_periodo=1
             PERIODO=int(MINUTES/10)
             attesi=pd.date_range(data_ricerca, periods=PERIODO,freq='10min')
@@ -170,7 +173,7 @@ for row in df_section.itertuples():
          id_operatore=1
          function=1
     #selezione del valore orario se la frequenza è 60
-    
+
     #ho selezionato il periodo atteso: estraggo il dataframe degli elementi attesi
     df=attesi.isin(element['data_e_ora'])
     #eseguo il ciclo di richiesta sui dati mancanti
@@ -182,6 +185,7 @@ for row in df_section.itertuples():
         frame_dati["granularity"]=id_periodo
         try:
             aa=Richiesta_remwsgwy(frame_dati)
+            esito['richiesti']+=1
         except:
             aa=[]
         if (len(aa)>2):
@@ -189,19 +193,23 @@ for row in df_section.itertuples():
             misura=aa[1]['datarow'].split(";")[1]
             QueryInsert=Inserisci_in_realtime(IRIS_SCHEMA_NAME,IRIS_TABLE_NAME,\
             row.idsensore,row.nometipologia,id_operatore,dato_mancante,misura,AUTORE)
+
             try:
                 conn.execute(QueryInsert)
+                esito['inseriti']+=1
                 if (DEBUG):
                     print("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
+                esito['errori']+=1
                 if (DEBUG):
                     print(QueryInsert+"non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"),file=sys.stderr)
         else:
+            esito['mancanti']+=1
             if (DEBUG):
                 print("Attenzione: dato di "+str(row.idsensore)+ " ASSENTE nel REM per "+ dato_mancante.strftime("%Y-%m-%d %H:%M"),file=sys.stderr)
      # prima di chiudere il ciclo chiedo la raffica del vento
     if(row.nometipologia=='VV' or row.nometipologia=='DV'):
-        id_operatore=3         
+        id_operatore=3
         frame_dati["operator_id"]=id_operatore
         try:
             aa=Richiesta_remwsgwy(frame_dati)
@@ -218,8 +226,8 @@ for row in df_section.itertuples():
                 if (DEBUG):
                     print ("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
             except:
-                        if(DEBUG):
-                            print(f"Query non riuscita! per {str(row.idsensore)}",file=sys.stderr)
+                if(DEBUG):
+                    print(f"Query non riuscita! per {str(row.idsensore)}",file=sys.stderr)
         else:
             if (DEBUG):
                 print("Attenzione: dato di "+h+ " sensore "+str( row.idsensore)+ " ASSENTE nel REM",file=sys.stderr)
@@ -231,5 +239,4 @@ try:
        print("...pulizia dati eseguita")
 except:
     print ("ERRORE: Pulizia dati non riuscita",file=sys.stderr)
-print(f"Recupero terminato per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
-print("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
+print(f"Esito {esito} per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
