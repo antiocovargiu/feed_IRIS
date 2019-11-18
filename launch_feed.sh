@@ -24,7 +24,7 @@ do
    fi
    if [ $2 == "R" ]
    then
-     echo "Eeguo recupero per $TIPOLOGIE"
+     echo "Eseguo recupero per $TIPOLOGIE"
     # logger -is -p user.notice "$nomescript: eseguo recupero per $TIPOLOGIE"
      python3 feed_iris_recupero.py
      sleep $dormi

@@ -94,7 +94,8 @@ def Richiesta_remwsgwy (framedati):
             return []
     except:
         esito['errori']+=1
-        print("Errore: REMWS non raggiungibile", end="\r")
+        if(DEBUG):
+            print("Errore: REMWS non raggiungibile", end="\r")
 
     if(ci_sono_dati):
         # estraggo il dato
@@ -147,6 +148,7 @@ for row in df_section.itertuples():
     timeDiff=dt.datetime.now()-s
     durata_script=timeDiff.total_seconds() / 60
     if (durata_script>10):
+        print(f"Esito {esito} per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
         sys.exit("Esecuzione troppo lunga - interrompo!")
     frame_dati["sensor_id"]=row.idsensore
     data_insert=data_ricerca
