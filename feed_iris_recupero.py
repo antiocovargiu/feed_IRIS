@@ -141,7 +141,7 @@ s=dt.datetime.now()
 conn=engine.connect()
 esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
 # inizio del ciclo vero e proprio
-for row in df_section.itertuples(name=None):
+for row in df_section.itertuples():
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
