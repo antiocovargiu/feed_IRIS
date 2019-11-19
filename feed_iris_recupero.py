@@ -29,7 +29,7 @@ if (AUTORE==None):
     IRIS_DB_NAME=os.getenv('IRIS_DB_NAME')
     IRIS_DB_HOST=os.getenv('IRIS_DB_HOST')
     h=os.getenv('TIPOLOGIE') # elenco delle tipologie da cercare nella tabella delle osservazioni realtime, è una stringa
-    DEBUG=os.getenv('DEBUG')
+    DEBUG=eval(os.getenv('DEBUG'))
     MINUTES=int(os.getenv('MINUTES'))
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
     TIMEOUT=int(os.getenv('TIMEOUT'))
@@ -141,7 +141,7 @@ s=dt.datetime.now()
 conn=engine.connect()
 esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
 # inizio del ciclo vero e proprio
-for row in df_section.itertuples():
+for row in df_section.itertuples(name=None):
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore

@@ -143,7 +143,7 @@ conn=engine.connect()
 regole={}
 esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
 # inizio del ciclo vero e proprio
-for row in df_section.itertuples():
+for row in df_section.itertuples(name=None):
     # controllo quanto tempo è passato: le alimentazioni possono durare al massimo 10'
     timeDiff=dt.datetime.now()-s
     durata_script=timeDiff.total_seconds() / 60
