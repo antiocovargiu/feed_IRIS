@@ -139,7 +139,7 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
 conn=engine.connect()
-esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
+esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     #estraggo i dati dal dataframe
@@ -226,6 +226,7 @@ for row in df_section.itertuples():
                 if (DEBUG):
                     print ("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
             except:
+                esito['db_err']+=1
                 if(DEBUG):
                     print(f"Query non riuscita! per {str(row.idsensore)}",file=sys.stderr)
         else:

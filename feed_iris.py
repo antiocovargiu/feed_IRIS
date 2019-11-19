@@ -141,7 +141,7 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 s=dt.datetime.now()
 conn=engine.connect()
 regole={}
-esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0}
+esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
     # controllo quanto tempo è passato: le alimentazioni possono durare al massimo 10'
@@ -221,7 +221,7 @@ for row in df_section.itertuples():
                 if (DEBUG):
                     print("+++",row.idsensore,data_ricerca,misura)
             except:
-                esito['errori']+=1
+                esito['db_err']+=1
                 if(DEBUG):
                     print("Query non riuscita! per ",row.idsensore)
         else:
