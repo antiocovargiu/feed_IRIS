@@ -142,6 +142,15 @@ conn=engine.connect()
 esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0}
 # inizio del ciclo vero e proprio
 for row in df_section.itertuples():
+    timeDiff=dt.datetime.now()-s
+    durata_script=(timeDiff.total_seconds() / 60)
+    if (durata_script>45):
+            print(f"Esito {esito} per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
+            sys.exit("Esecuzione troppo lunga - interrompo!")
+    durata_script=durata_script % 5
+    # ogni 10 minuti stampo l'Esito
+    if (durata_script < 1):
+        print(f"....{esito}")
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
