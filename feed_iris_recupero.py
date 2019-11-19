@@ -200,7 +200,7 @@ for row in df_section.itertuples():
                 if (DEBUG):
                     print("+++++++Query eseguita per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"))
             except:
-                esito['errori']+=1
+                esito['db_err']+=1
                 if (DEBUG):
                     print(QueryInsert+"non riuscita! per "+str(row.idsensore)+" "+ dato_mancante.strftime("%Y-%m-%d %H:%M"),file=sys.stderr)
         else:
@@ -226,7 +226,7 @@ for row in df_section.itertuples():
                 if (DEBUG):
                     print ("+++"+str(row.idsensore)+" "+ data_ricerca+" "+str(misura))
             except:
-                esito['db_err']+=1
+
                 if(DEBUG):
                     print(f"Query non riuscita! per {str(row.idsensore)}",file=sys.stderr)
         else:
