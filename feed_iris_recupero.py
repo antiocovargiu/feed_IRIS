@@ -64,6 +64,7 @@ def Inserisci_in_realtime(schema,table,idsensore,tipo,operatore,datar,misura,aut
     datar.strftime("%Y-%m-%d %H:%M")+"',"+str(misura)+",'"+ autore+"','"+mystring+"');"
     return Query_Insert
 def Richiesta_remwsgwy (framedati):
+    global esito
     #funzione di colloquio con il remws: manda la dichiesta e decodifica la risposta
     richiesta={
         'header':{'id': 10},
