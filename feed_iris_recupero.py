@@ -143,7 +143,6 @@ frame_dati["start"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
-conn=engine.connect()
 esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0,'time':0}
 
 # inizio del ciclo vero e proprio
@@ -161,6 +160,8 @@ for row in df_section.itertuples():
         df_dati=pd.read_sql(QueryDati, conn)
         print(f"....{esito}")
         stampa_esito=dt.datetime.now()
+        if(len(df_dati.index)==0):
+            sys.exit("Dataframe vuoto - interrompo!")
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
