@@ -71,7 +71,11 @@ def Richiesta_remwsgwy (framedati):
         }
     ci_sono_dati=False
     try:
+        t0=dt.datetime.now()
         r=requests.post(url,data=js.dumps(richiesta),timeout=TIMEOUT)
+        t1=dt.datetome.now()
+        t_delta=t1-t0
+        esito['time']+=t_delta.total_seconds()
         if(len(r.text)>0):
                 risposta=js.loads(r.text)
                 #controllo progressivamente se la risposta è buona e se ci sono dati
@@ -139,18 +143,22 @@ frame_dati["finish"]=data_ricerca.strftime("%Y-%m-%d %H:%M")
 #suppongo che in df_section ci siano solo i sensori che mi interessano e faccio il ciclo di richiesta
 s=dt.datetime.now()
 conn=engine.connect()
-esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0}
+esito={'richiesti':0,'ricevuti':0,'inseriti':0,'errori':0,'mancanti':0,'db_err':0,'time':0}
+
 # inizio del ciclo vero e proprio
+stampa_esito=dt.datetime.now()
 for row in df_section.itertuples():
     timeDiff=dt.datetime.now()-s
+    timeDiff_esito=dt.datetime.now()-stampa_esito
     durata_script=(timeDiff.total_seconds() / 60)
     if (durata_script>45):
             print(f"Esito {esito} per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
             sys.exit("Esecuzione troppo lunga - interrompo!")
-    durata_script=durata_script % 5
+
     # ogni 10 minuti stampo l'Esito
-    if (durata_script < 1):
+    if (timeDiff_esito.total_seconds() > 600):
         print(f"....{esito}")
+        stampa_esito=dt.datetime.now()
     #estraggo i dati dal dataframe
     element=df_dati[df_dati.idsensore==row.idsensore]
     frame_dati["sensor_id"]=row.idsensore
