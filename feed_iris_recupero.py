@@ -156,8 +156,9 @@ for row in df_section.itertuples():
             print(f"Esito {esito} per {TIPOLOGIE} inizio {s} fine {dt.datetime.now()}")
             sys.exit("Esecuzione troppo lunga - interrompo!")
 
-    # ogni 10 minuti stampo l'Esito
+    # ogni 10 minuti stampo l'Esito (e rifaccio la query)
     if (timeDiff_esito.total_seconds() > 600):
+        df_dati=pd.read_sql(QueryDati, conn)
         print(f"....{esito}")
         stampa_esito=dt.datetime.now()
     #estraggo i dati dal dataframe
