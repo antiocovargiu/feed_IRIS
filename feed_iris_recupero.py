@@ -74,7 +74,7 @@ def Richiesta_remwsgwy (framedati):
     try:
         t0=dt.datetime.now()
         r=requests.post(url,data=js.dumps(richiesta),timeout=TIMEOUT)
-        t1=dt.datetome.now()
+        t1=dt.datetime.now()
         t_delta=t1-t0
         esito['time']+=t_delta.total_seconds()
         if(len(r.text)>0):
