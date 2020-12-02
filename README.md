@@ -9,7 +9,7 @@ Alimentazione di IRIS tramite script python in sostituzione di recupero_RT
 # utilizzo
 Il recupero viene gestito dal launcher che accetta in ingresso tre parametri
 ```
-./launch_feed.sh  arg1 arg2 arg3
+./launch_feed.sh  arg1 arg2 arg3 arg4
 ```
 
 _arg1_ minuto al quale esegue il comando
@@ -17,6 +17,8 @@ _arg1_ minuto al quale esegue il comando
 _arg2_ flag per recupero: *R* esegue il recupero, ogni altro carattere non esegue il recupero (es. *N*)
 
 _arg3_ tempo in secondi tra una esecuzione e la successiva (*facoltativo, default 3600*)
+
+_arg4_ (facoltativo) in caso di recupero se 'S' eseguo una sola volta (utile se si deve recuperare una data specifica definita con DATAFINE)
 
 
 # ENV
@@ -40,6 +42,7 @@ IRIS_USER_PWD password dell'utente IRIS_USER_ID
 
 NAME nome dell'autore dell'inserimento
 
+DATAFINE (facaltativa) data in formato yyyymmddHHMM (e.s. 202011190440), per recuperare una specifica data.
 
 # esempio
 ```
