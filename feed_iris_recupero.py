@@ -37,11 +37,6 @@ if (AUTORE==None):
 TIPOLOGIE=h.split()
 url=REMWS_GATEWAY
 
-# Check se eventualmente si vuole alimentare un altro db (e.s. iris_devel)
-IRIS_DB_NAME_ALT=os.getenv('IRIS_DB_NAME_ALT')
-if IRIS_DB_NAME_ALT is not None:
-    IRIS_DB_NAME = IRIS_DB_NAME_ALT
-
 # Check se si vogliono eliminare i dati passati (default True)
 DEL_PAST_DATA=os.getenv('DEL_PAST_DATA')
 if DEL_PAST_DATA is None:
@@ -141,7 +136,8 @@ df_dati=pd.read_sql(QueryDati, conn)
 minuto=int(datainizio.minute/10)*10
 data_ricerca=dt.datetime(datainizio.year,datainizio.month,datainizio.day,datainizio.hour,minuto,0)
 data_elimina=data_ricerca - dt.timedelta(days=15)
-df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)]
+# aggiunto sort casuale per parallelizzazione
+df_section=df_sensori[df_sensori.nometipologia.isin(TIPOLOGIE)].sample(frac=1)
 #ciclo sui sensori:
 # strutturo la richiesta
 id_operatore=1
