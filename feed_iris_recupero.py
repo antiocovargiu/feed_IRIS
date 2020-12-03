@@ -32,11 +32,24 @@ if (AUTORE==None):
     DEBUG=os.getenv('DEBUG')
     MINUTES=int(os.getenv('MINUTES'))
     REMWS_GATEWAY=os.getenv('REMWS_GATEWAY')
-    # trasformo la stringa in lista
 
-url=REMWS_GATEWAY
+# trasformo la stringa in lista
 TIPOLOGIE=h.split()
-# inizializzazione delle date
+url=REMWS_GATEWAY
+
+# Check se eventualmente si vuole alimentare un altro db (e.s. iris_devel)
+IRIS_DB_NAME_ALT=os.getenv('IRIS_DB_NAME_ALT')
+if IRIS_DB_NAME_ALT is not None:
+    IRIS_DB_NAME = IRIS_DB_NAME_ALT
+
+# Check se si vogliono eliminare i dati passati (default True)
+DEL_PAST_DATA=os.getenv('DEL_PAST_DATA')
+if DEL_PAST_DATA is None:
+    purge = True
+else:
+    purge = eval(DEL_PAST_DATA)
+
+# inizializzazione delle date: check se voglio recuoerare una data particolare  
 DATAFINE=os.getenv('DATAFINE')
 if DATAFINE is None:
     datafine = dt.datetime.utcnow()+dt.timedelta(hours=1)   
@@ -46,8 +59,6 @@ else:
     datafine = datafine+dt.timedelta(minutes=10)
 
 datainizio=datafine-dt.timedelta(minutes=MINUTES)
-
-
 
 if (eval(DEBUG)):
     logging.debug(eval(DEBUG))
@@ -234,12 +245,13 @@ for row in df_section.itertuples():
         #fine ciclo sensore
 
 QueryDelete='DELETE FROM '+'"'+IRIS_SCHEMA_NAME+'"."'+IRIS_TABLE_NAME+'"' +' WHERE data_e_ora <'+"'"+data_elimina.strftime("%Y-%m-%d %H:%M")+"'"
-try:
-    conn.execute(QueryDelete)
-    if (eval(DEBUG)):
-        logging.info("+++pulizia dati eseguita")
-except:
-    logging.error("ERR: Pulizia dati non riuscita")
+if purge:
+    try:
+        conn.execute(QueryDelete)
+        if (eval(DEBUG)):
+            logging.info("+++pulizia dati eseguita")
+    except:
+        logging.error("ERR: Pulizia dati non riuscita")
 
 print("Recupero terminato per",TIPOLOGIE,"inizio",s,"fine", dt.datetime.now())
 logging.info("Recupero terminato per {0} inizio "+s.strftime("%Y-%m-%d %H:%M:%s")+ " fine "+ dt.datetime.now().strftime("%Y-%m-%d %H:%M:%s"),format(h))
